@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutoriais — Concursa AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Design Tokens ─────────────────────────────────────── */
+    :root {
+      --color-bg:          #2C2A27;   /* primary 60% – dark background */
+      --color-surface:     #363330;   /* cards / panels */
+      --color-surface-alt: #3F3C38;   /* hover surface */
+      --color-border:      #4A4640;   /* subtle borders */
+      --color-accent:      #F3E600;   /* yellow – 10% highlight */
+      --color-accent-dark: #E1CD00;   /* yellow pressed */
+      --color-text:        #F0EDE8;   /* primary text */
+      --color-text-muted:  #9E9891;   /* secondary text */
+      --color-text-dim:    #6E6259;   /* dimmed text */
+      --color-overlay:     rgba(20, 18, 16, 0.75);
+
+      --radius-sm:  8px;
+      --radius-md:  12px;
+      --radius-lg:  16px;
+      --radius-xl:  24px;
+
+      --shadow-card:  0 2px 8px rgba(0,0,0,.35);
+      --shadow-modal: 0 24px 64px rgba(0,0,0,.6);
+
+      --font: 'Inter', system-ui, sans-serif;
+      --transition: 0.18s ease;
+    }
+
+    /* ─── Reset ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--color-accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+    /* ─── Page Layout ────────────────────────────────────────── */
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+    }
+
+    /* ─── Page Title ─────────────────────────────────────────── */
+    .page-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: 8px;
+    }
+    .page-heading {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--color-text);
+      margin-bottom: 48px;
+      line-height: 1.15;
+    }
+    .page-heading span {
+      color: var(--color-accent);
+    }
+
+    /* ─── Module Section ─────────────────────────────────────── */
+    .module + .module { margin-top: 48px; }
+
+    .module-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .module-badge {
+      background: var(--color-accent);
+      color: #1A1800;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .module-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+    .module-divider {
+      flex: 1;
+      height: 1px;
+      background: var(--color-border);
+    }
+
+    /* ─── Cards Grid ─────────────────────────────────────────── */
+    .lessons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .lesson-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      cursor: pointer;
+      transition: transform var(--transition), background var(--transition), border-color var(--transition), box-shadow var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .lesson-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-md);
+      border: 2px solid transparent;
+      transition: border-color var(--transition);
+      pointer-events: none;
+    }
+    .lesson-card:hover {
+      background: var(--color-surface-alt);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card);
+    }
+    .lesson-card:hover::after {
+      border-color: var(--color-accent);
+    }
+    .lesson-card:active { transform: translateY(0); }
+
+    .card-icon-wrap {
+      width: 44px;
+      height: 44px;
+      background: rgba(243, 230, 0, 0.12);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-icon-wrap svg {
+      width: 22px;
+      height: 22px;
+      fill: var(--color-accent);
+    }
+
+    .card-body { flex: 1; }
+    .card-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-text-dim);
+      margin-bottom: 4px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text);
+      line-height: 1.4;
+    }
+
+    .card-arrow {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(243, 230, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      align-self: flex-end;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .lesson-card:hover .card-arrow {
+      background: var(--color-accent);
+      transform: translateX(2px);
+    }
+    .card-arrow svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--color-accent);
+      fill: none;
+      transition: stroke var(--transition);
+    }
+    .lesson-card:hover .card-arrow svg { stroke: #1A1800; }
+
+    /* ─── Modal Overlay ──────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--color-overlay);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ─── Modal Panel ────────────────────────────────────────── */
+    .modal {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-modal);
+      transform: translateY(16px) scale(0.97);
+      transition: transform 0.22s ease;
+      position: relative;
+    }
+    .modal-overlay.open .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-header {
+      padding: 28px 28px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .modal-icon-wrap {
+      width: 52px;
+      height: 52px;
+      background: rgba(243, 230, 0, 0.14);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .modal-icon-wrap svg {
+      width: 26px;
+      height: 26px;
+      fill: var(--color-accent);
+    }
+    .modal-meta { flex: 1; }
+    .modal-module-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 4px;
+    }
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-text);
+      line-height: 1.3;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--color-surface-alt);
+      border: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background var(--transition);
+    }
+    .modal-close:hover { background: var(--color-border); }
+    .modal-close svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--color-text-muted);
+      fill: none;
+    }
+
+    .modal-body { padding: 20px 28px 28px; }
+    .modal-description {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .modal-links { display: flex; flex-direction: column; gap: 10px; }
+    .modal-link-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 18px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      transition: all var(--transition);
+      text-decoration: none;
+    }
+    .modal-link-btn.primary {
+      background: var(--color-accent);
+      color: #1A1800;
+    }
+    .modal-link-btn.primary:hover {
+      background: var(--color-accent-dark);
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+    .modal-link-btn.secondary {
+      background: transparent;
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+    .modal-link-btn.secondary:hover {
+      background: var(--color-surface-alt);
+      text-decoration: none;
+    }
+    .modal-link-btn svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+    .modal-link-btn.primary svg { stroke: #1A1800; fill: none; }
+    .modal-link-btn.secondary svg { stroke: var(--color-text-muted); fill: none; }
+
+    /* ─── Scrollbar ──────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+
+    /* ─── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .page { padding: 32px 20px 60px; }
+      .page-heading { font-size: 24px; }
+      .lessons-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .modal { border-radius: var(--radius-lg); }
+    }
+    @media (max-width: 400px) {
+      .lessons-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <p class="page-title">Concursa AI</p>
+  <h1 class="page-heading">TUTORIAIS</h1>
+
+  <div id="modules-container"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal" id="modal-panel">
+    <div class="modal-header">
+      <div class="modal-icon-wrap" id="modal-icon"></div>
+      <div class="modal-meta">
+        <p class="modal-module-label" id="modal-module-label"></p>
+        <h2 class="modal-title" id="modal-title"></h2>
+      </div>
+      <button class="modal-close" id="modal-close" aria-label="Fechar">
+        <svg viewBox="0 0 24 24" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-description" id="modal-description"></p>
+      <div class="modal-links" id="modal-links"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ─── Icons SVG ─────────────────────────────────────────────── */
+  const ICONS = {
+    rocket: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.5 2 5.5 5 5.5 5L3 10l3 1 1 3 1.5-1.5C9.5 14 11 17 11 17l-2 2h1.5l1.5-1 1 3 3-3-1-3.5 3.5-3.5C20.5 11.5 22 9 22 6 22 3.5 19.5 2 12 2zm5 5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM3 18l-1 3 3-1 2-2-2-2-2 2z"/></svg>`,
+    book: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4zm2 0v14h10V4H6zm2 3h6v2H8V7zm0 4h6v2H8v-2zm0 4h4v2H8v-2z"/></svg>`,
+    cards: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H6zm-3 5a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1h-1v1H4v-7h1V9H3z"/></svg>`,
+    clipboard: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 2a1 1 0 0 0-1 1v1H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V3a1 1 0 0 0-1-1H8zm1 2h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V4zm-4 2h2v1a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3V6h2v14H5V6zm3 6h8v2H8v-2zm0 4h5v2H8v-2z"/></svg>`,
+    target: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 2a8 8 0 1 1 0 16A8 8 0 0 1 12 4zm0 2a6 6 0 1 0 0 12A6 6 0 0 0 12 6zm0 2a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>`,
+    docs: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm0 2h7v5h5v11H6V4zm9 .83L17.17 7H15V4.83zM8 10h8v2H8v-2zm0 4h8v2H8v-2zm0 4h5v2H8v-2z"/></svg>`,
+    trash: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 3a1 1 0 0 0-1 1H5a1 1 0 0 0 0 2h14a1 1 0 0 0 0-2h-3a1 1 0 0 0-1-1H9zm-3 5v11a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8H6zm2 2h2v9H8v-9zm4 0h2v9h-2v-9z"/></svg>`,
+    sun: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 4a1 1 0 0 1 1 1V6a1 1 0 0 1-2 0V5a1 1 0 0 1 1-1zM5.636 6.05a1 1 0 0 1 1.414 0l.707.707a1 1 0 1 1-1.414 1.415l-.707-.708a1 1 0 0 1 0-1.414zM18.364 6.05a1 1 0 0 1 0 1.414l-.707.707a1 1 0 0 1-1.414-1.414l.707-.707a1 1 0 0 1 1.414 0zM12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm-7 3a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2h1zm15 0a1 1 0 0 1 0 2h-1a1 1 0 0 1 0-2h1zM7.05 16.95a1 1 0 0 1 1.414 1.414l-.707.707a1 1 0 0 1-1.414-1.414l.707-.707zm9.9 0l.707.707a1 1 0 0 1-1.414 1.414l-.707-.707a1 1 0 0 1 1.414-1.414zM12 18a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1z"/></svg>`,
+    play: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>`,
+    link: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
+    arrow: `<svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`,
+  };
+
+  /* ─── Data ──────────────────────────────────────────────────── */
+  const modules = [
+    {
+      id: 1,
+      title: "Comece por AQUI",
+      lessons: [
+        {
+          id: "1-1",
+          icon: "rocket",
+          aula: "Aula 1",
+          title: "Como Acessar a Concursa AI",
+          description: "Neste módulo você vai aprender como acessar a plataforma Concursa AI e fazer seu login pela primeira vez. Siga exatamente o passo a passo mostrado no vídeo e você estará pronto para começar.\n\nPara acessar a plataforma, utilize o link disponível abaixo.",
+          links: [
+            { label: "Assistir Aula", href: "https://www.youtube.com/watch?v=CxNckyFwTek", type: "primary", icon: "play" },
+            { label: "Acessar a Concursa AI", href: "https://app.concursaai.com", type: "secondary", icon: "link" },
+          ]
+        }
+      ]
+    },
+    {
+      id: 2,
+      title: "Aprenda a Utilizar a Concursa AI",
+      lessons: [
+        {
+          id: "2-1",
+          icon: "book",
+          aula: "Aula 1",
+          title: "Como Estudar pela Concursa AI",
+          description: "Agora que você já sabe como acessar a plataforma, chegou a hora de aprender a estudar do jeito certo usando a Concursa AI! Neste vídeo, você vai descobrir como aproveitar ao máximo todos os recursos disponíveis para acelerar sua preparação para concursos públicos.\n\nVeja na prática como utilizar Flashcards e Revisão, Simulados e a plataforma completa — entendendo o fluxo ideal de estudos para conquistar sua aprovação.",
+          links: [
+            { label: "Assistir Aula", href: "https://youtu.be/8lT6wzMuv10?si=vf9J8jaNodF6hgHH", type: "primary", icon: "play" },
+            { label: "Acessar a Concursa AI", href: "https://app.concursaai.com", type: "secondary", icon: "link" },
+          ]
+        },
+        {
+          id: "2-2",
+          icon: "cards",
+          aula: "Aula 2",
+          title: "Como Gerar Flashcards na Concursa AI",
+          description: "Neste vídeo você vai aprender como gerar seus próprios Flashcards diretamente na Concursa AI! Uma das funcionalidades mais poderosas da plataforma para fixar conteúdo de forma rápida, prática e inteligente — tudo com o apoio da Inteligência Artificial.\n\nChega de criar fichas de revisão manualmente! Com a Concursa AI, você gera flashcards personalizados em segundos e potencializa sua memorização para arrasar nas provas.",
+          links: [
+            { label: "Assistir Aula", href: "https://youtu.be/h_Q5F-7yV7o?si=fvZTpBvxO2-eIk8B", type: "primary", icon: "play" },
+            { label: "Acessar a Concursa AI", href: "https://app.concursaai.com", type: "secondary", icon: "link" },
+          ]
+        },
+        {
+          id: "2-3",
+          icon: "clipboard",
+          aula: "Aula 3",
+          title: "Como Fazer Simulados na Concursa AI",
+          description: "Neste vídeo você vai aprender como fazer simulados diretamente na Concursa AI! Testar seus conhecimentos é uma das etapas mais importantes na preparação para concursos públicos — e com a nossa plataforma, você faz isso de forma simples, rápida e totalmente direcionada para sua aprovação.\n\nAcompanhe o passo a passo e descubra como utilizar os simulados para identificar seus pontos fracos, medir sua evolução e chegar cada vez mais preparado para o dia da prova!",
+          links: [
+            { label: "Assistir Aula", href: "https://youtu.be/2oOeBZEL5r0?si=6kjuD20J_e9VuSt1", type: "primary", icon: "play" },
+            { label: "Acessar a Concursa AI", href: "https://app.concursaai.com", type: "secondary", icon: "link" },
+          ]
+        },
+        {
+          id: "2-4",
+          icon: "target",
+          aula: "Aula 4",
+          title: "Como Utilizar o Hacker de Banca na Concursa AI",
+          description: "Neste vídeo você vai aprender como utilizar o Hacker de Banca, um dos recursos mais exclusivos e estratégicos da Concursa AI! Com essa funcionalidade, você consegue decifrar o padrão de cobrança das principais bancas e estudar de forma muito mais direcionada e eficiente.\n\nPare de estudar achando que vai cair na prova — com o Hacker de Banca você estuda o que realmente importa, no estilo de cada banca, e chega no dia da prova com muito mais segurança e estratégia!",
+          links: [
+            { label: "Assistir Aula", href: "https://youtu.be/jRX9tbZp8fA?si=oMjXXPlzJlCFWfNz", type: "primary", icon: "play" },
+            { label: "Acessar a Concursa AI", href: "https://app.concursaai.com", type: "secondary", icon: "link" },
+          ]
+        },
+        {
+          id: "2-5",
+          icon: "docs",
+          aula: "Aula 5",
+          title: "Como Adicionar Editais e Estudar para Múltiplos Concursos",
+          description: "Neste vídeo você aprende como enviar seu edital para a Concursa AI e estudar para mais de um concurso ao mesmo tempo — tudo organizado em um só lugar, de forma simples e estratégica.\n\nNão perca mais tempo tentando conciliar diferentes materiais. Com a Concursa AI, você centraliza tudo e estuda com muito mais foco.",
+          links: [
+            { label: "Assistir Aula", href: "https://youtu.be/QVWf5k1isU0?si=0cAUotzzl2Ykf68d", type: "primary", icon: "play" },
+            { label: "Acessar a Concursa AI", href: "https://app.concursaai.com", type: "secondary", icon: "link" },
+          ]
+        },
+        {
+          id: "2-6",
+          icon: "trash",
+          aula: "Aula 6",
+          title: "Como Excluir um Plano de Estudos na Concursa AI",
+          description: "Neste vídeo você aprende como excluir um plano de estudos antigo na Concursa AI — mantendo sua plataforma organizada e focada apenas no que realmente importa para sua preparação atual.\n\nMantenha seu ambiente de estudos limpo e eficiente para maximizar seu rendimento.",
+          links: [
+            { label: "Assistir Aula", href: "https://youtu.be/MXqkolWGjBo?si=T0J-bw8-K_rOCzq8", type: "primary", icon: "play" },
+            { label: "Acessar a Concursa AI", href: "https://app.concursaai.com", type: "secondary", icon: "link" },
+          ]
+        },
+        {
+          id: "2-7",
+          icon: "sun",
+          aula: "Aula 7",
+          title: "Como Trocar para o Modo Claro na Concursa AI",
+          description: "Neste vídeo você aprende como alternar a tela para o modo claro na Concursa AI — personalize a plataforma do jeito que for mais confortável para os seus estudos!\n\nEscolha o tema que melhor se adapta ao seu ambiente e prefira estudar com mais conforto visual.",
+          links: [
+            { label: "Assistir Aula", href: "https://youtu.be/n7-GnfufGKo?si=qMQSA-ESVeiIB9Fy", type: "primary", icon: "play" },
+            { label: "Acessar a Concursa AI", href: "https://app.concursaai.com", type: "secondary", icon: "link" },
+          ]
+        }
+      ]
+    }
+  ];
+
+  /* ─── Render Modules ────────────────────────────────────────── */
+  const container = document.getElementById('modules-container');
+
+  modules.forEach(mod => {
+    const section = document.createElement('section');
+    section.className = 'module';
+    section.innerHTML = `
+      <div class="module-header">
+        <span class="module-badge">Módulo ${mod.id}</span>
+        <span class="module-title">${mod.title}</span>
+        <div class="module-divider"></div>
+      </div>
+      <div class="lessons-grid" id="grid-${mod.id}"></div>
+    `;
+    container.appendChild(section);
+
+    const grid = section.querySelector(`#grid-${mod.id}`);
+    mod.lessons.forEach(lesson => {
+      const card = document.createElement('div');
+      card.className = 'lesson-card';
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `Abrir ${lesson.title}`);
+      card.innerHTML = `
+        <div class="card-icon-wrap">${ICONS[lesson.icon]}</div>
+        <div class="card-body">
+          <p class="card-label">${lesson.aula}</p>
+          <p class="card-title">${lesson.title}</p>
+        </div>
+        <div class="card-arrow">${ICONS.arrow}</div>
+      `;
+      card.addEventListener('click', () => openModal(mod, lesson));
+      card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openModal(mod, lesson); });
+      grid.appendChild(card);
+    });
+  });
+
+  /* ─── Modal Logic ───────────────────────────────────────────── */
+  const overlay  = document.getElementById('modal-overlay');
+  const closeBtn = document.getElementById('modal-close');
+
+  function openModal(mod, lesson) {
+    document.getElementById('modal-icon').innerHTML = ICONS[lesson.icon];
+    document.getElementById('modal-module-label').textContent = `Módulo ${mod.id} · ${lesson.aula}`;
+    document.getElementById('modal-title').textContent = lesson.title;
+    document.getElementById('modal-description').textContent = lesson.description;
+
+    const linksEl = document.getElementById('modal-links');
+    linksEl.innerHTML = '';
+    lesson.links.forEach(l => {
+      const a = document.createElement('a');
+      a.href = l.href;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.className = `modal-link-btn ${l.type}`;
+      a.innerHTML = `${ICONS[l.icon]} ${l.label}`;
+      linksEl.appendChild(a);
+    });
+
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    closeBtn.focus();
+  }
+
+  function closeModal() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
